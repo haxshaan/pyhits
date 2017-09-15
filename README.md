@@ -12,6 +12,7 @@ A Python program to get hits.
 (Use Pip to install all dependencies)
 
 3. Install adb and add it to PATH
+(Use this or latest: http://www.mediafire.com/file/ccnnv843a20tqbn/minimal_adb_fastboot_v1.4.3.zip)
 
 4. Set PATH
 (Click on Start and Type Environment, Edit system PATH)
