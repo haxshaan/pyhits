@@ -119,7 +119,7 @@ def get_ip():
     i = 5
     while i:
         try:
-            my_ip = requests.get('http://ipecho.net/plain?').text
+            my_ip = requests.get('http://ip.42.pl/raw').text
             return my_ip
         except:
             print "Unable to get IP, trying again.."
