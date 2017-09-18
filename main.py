@@ -30,22 +30,20 @@ class HitFun:
         ran = randint(1, 10)
         return u_agents.get(ran, 2)
 
-
     def f_profile(self):
         profile = webdriver.FirefoxProfile()
         profile.set_preference("browser.privatebrowsing.autostart", True)
         profile.set_preference("general.useragent.override", self.r_useragent())
         return profile
 
-    def open(self):
-
-        driver = webdriver.Firefox(firefox_profile=self.f_profile())
-        print "Everything is OK, opening link.."
+    def open_firefox(self):
+        
+        driver = webdriver.Firefox(executable_path=r'firefox_driver\geckodriver.exe', firefox_profile=self.f_profile())
         driver.get(self.url)
 
         try:
             wait = WebDriverWait(driver, 12)
-            element = wait.until(EC.element_to_be_clickable((By.CLASS_NAME, 'installLink')))
+            wait.until(EC.element_to_be_clickable((By.CLASS_NAME, 'installLink')))
 
         except TimeoutException:
             print "Loading took too much time!"
@@ -55,7 +53,39 @@ class HitFun:
         install.click()
         try:
             wait = WebDriverWait(driver, 6)
-            element = wait.until(EC.element_to_be_clickable((By.CLASS_NAME, 'id-app-title')))
+            wait.until(EC.element_to_be_clickable((By.CLASS_NAME, 'id-app-title')))
+
+        except TimeoutException:
+            print "Loading took too much time!"
+        sleep(1)
+        driver.close()
+
+    def c_profile(self):
+        c_option = webdriver.ChromeOptions()
+        c_option.add_argument('--incognito')
+        user_agent = self.r_useragent()
+        c_option.add_argument("--user-agent="+user_agent)
+        return c_option
+
+    def open_chrome(self):
+
+        driver = webdriver.Chrome(executable_path='chromedriver/chromedriver.exe', chrome_options=self.c_profile())
+
+        driver.get(self.url)
+
+        try:
+            wait = WebDriverWait(driver, 12)
+            wait.until(EC.element_to_be_clickable((By.CLASS_NAME, 'installLink')))
+
+        except TimeoutException:
+            print "Loading took too much time!"
+
+        install = driver.find_element_by_class_name("installLink")
+
+        install.click()
+        try:
+            wait = WebDriverWait(driver, 5)
+            wait.until(EC.element_to_be_clickable((By.CLASS_NAME, 'id-app-title')))
 
         except TimeoutException:
             print "Loading took too much time!"
@@ -72,7 +102,9 @@ def data_off():
 
 
 def check_internet():
+
     REMOTE_SERVER = "www.google.com"
+
     try:
 
         # Lets check if DNS could be resolved
@@ -104,7 +136,7 @@ def turn_off_data():
             print "Internet still working, lets try again!"
             continue
         else:
-            print "Mobile Data is turned OFF!\n---- ---- ---- ---- ---- ---- ---- ----"
+            print "Mobile Data is turned OFF!\n"
             break
 
 
@@ -115,10 +147,11 @@ def turn_on_data():
 
             data_on()
 
-            sleep(7)
+            sleep(8)
 
             print "Checking connectivity, pinging google.."
-        except check_internet() == False:
+
+        except not check_internet():
             print "Internet not working, lets try again!"
             continue
         else:
@@ -141,21 +174,46 @@ def get_ip():
 print "Welcome to Hax 4Fun clicker!\n==========================================="
 print "\nPlease make sure that your Phone is connected and USB Debugging and USB Tethering is enabled."
 
-url = str(raw_input("Enter your 4Fun url: "))
 
-my_4fun = HitFun(url)
+first_url = str(raw_input("Enter your first 4Fun url: "))
+second_url = str(raw_input("Enter second 4Fun url: "))
+
+my_4fun1 = HitFun(url=first_url)
+my_4fun2 = HitFun(url=second_url)
 
 while True:
     try:
         n_hits = int(raw_input("Enter the number of Hits to give: "))
 
     except ValueError:
-        print "The entered value is not recognised, Try again!"
+        print "Not a valid response,Please Try again!"
         continue
 
     else:
         break
 
+
+def select_browser():
+
+    print "Which browser you want to use? Press num key:"
+    while True:
+        try:
+            browser_name = int(raw_input("'1' Firefox\n'2' Chrome\nEnter you choice: "))
+
+        except ValueError:
+            print "UhhOhh! Please enter only integer, Try again!"
+            continue
+        else:
+            break
+    if browser_name == 1:
+        print "You selected Firefox browser!\n"
+    else:
+        print "You selected Chrome browser!\n"
+    return browser_name
+
+browser_to_use = select_browser()
+
+hit_counter = 1
 hits_done = 0
 
 while n_hits:
@@ -167,10 +225,26 @@ while n_hits:
 
     print "Your IP Address is: ", get_ip()
 
-    my_4fun.open()
+    if browser_to_use == 1:
+        if hit_counter % 2 == 0:
+            print "Everything is OK, opening Link 2"
+            my_4fun1.open_firefox()
+        else:
+            print "Everything is OK, opening Link 1"
+            my_4fun2.open_firefox()
 
-    print "Hit was successful"
+    else:
+        if hit_counter % 2 == 0:
+            print "Everything is OK, opening Link 2"
+            my_4fun1.open_chrome()
+        else:
+            print "Everything is OK, opening Link 1"
+            my_4fun2.open_chrome()
+
     hits_done += 1
-    n_hits -= 1
+    print "Hit was successful\n"
+    print "Total Successful hits done: %d" % hits_done
+    print "==== ==== ==== ==== ==== ==== ==== ==== ==== ==== ==== ===="
 
-print "Total Successful hits done: %d" %(hits_done)
+    n_hits -= 1
+    hit_counter += 1
