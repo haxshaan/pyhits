@@ -1,4 +1,4 @@
-# hit4fun
+# pyhits
 A Python program to get hits.
 
 -----Installation-----
