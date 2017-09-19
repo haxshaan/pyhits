@@ -34,63 +34,85 @@ class HitFun:
         profile = webdriver.FirefoxProfile()
         profile.set_preference("browser.privatebrowsing.autostart", True)
         profile.set_preference("general.useragent.override", self.r_useragent())
+        profile.set_preference('permissions.default.image', 1)
         return profile
 
     def open_firefox(self):
-        
+
         driver = webdriver.Firefox(executable_path=r'firefox_driver\geckodriver.exe', firefox_profile=self.f_profile())
-        driver.get(self.url)
 
         try:
-            wait = WebDriverWait(driver, 12)
-            wait.until(EC.element_to_be_clickable((By.CLASS_NAME, 'installLink')))
 
-        except TimeoutException:
-            print "Loading took too much time!"
+            driver.get(self.url)
 
-        install = driver.find_element_by_class_name("installLink")
+            try:
+                wait = WebDriverWait(driver, 14)
+                wait.until(EC.presence_of_element_located((By.CLASS_NAME, 'installLink')))
 
-        install.click()
-        try:
-            wait = WebDriverWait(driver, 6)
-            wait.until(EC.element_to_be_clickable((By.CLASS_NAME, 'id-app-title')))
+            except TimeoutException:
+                print "Loading took too much time!"
 
-        except TimeoutException:
-            print "Loading took too much time!"
-        sleep(1)
-        driver.close()
+            install = driver.find_element_by_class_name("installLink")
+
+            install.click()
+            try:
+                wait = WebDriverWait(driver, 9)
+                wait.until(EC.presence_of_element_located((By.CLASS_NAME, 'details-info')))
+
+            except TimeoutException:
+                print "Loading took too much time!"
+            sleep(1)
+
+            driver.close()
+
+        except Exception, e:
+            print "Something is not right! Error: ", e
+            print "Closing the instance of browser!"
+            driver.close()
 
     def c_profile(self):
+
         c_option = webdriver.ChromeOptions()
         c_option.add_argument('--incognito')
+
         user_agent = self.r_useragent()
         c_option.add_argument("--user-agent="+user_agent)
+
+        prefs = {"profile.managed_default_content_settings.images":2}
+        c_option.add_experimental_option("prefs", prefs)
+
         return c_option
 
     def open_chrome(self):
 
         driver = webdriver.Chrome(executable_path='chromedriver/chromedriver.exe', chrome_options=self.c_profile())
 
-        driver.get(self.url)
-
         try:
-            wait = WebDriverWait(driver, 12)
-            wait.until(EC.element_to_be_clickable((By.CLASS_NAME, 'installLink')))
 
-        except TimeoutException:
-            print "Loading took too much time!"
+            driver.get(self.url)
 
-        install = driver.find_element_by_class_name("installLink")
+            try:
+                wait = WebDriverWait(driver, 14)
+                wait.until(EC.presence_of_element_located((By.CLASS_NAME, 'installLink')))
 
-        install.click()
-        try:
-            wait = WebDriverWait(driver, 5)
-            wait.until(EC.element_to_be_clickable((By.CLASS_NAME, 'id-app-title')))
+            except TimeoutException:
+                print "Loading took too much time!"
 
-        except TimeoutException:
-            print "Loading took too much time!"
-        sleep(1)
-        driver.close()
+            install = driver.find_element_by_class_name("installLink")
+
+            install.click()
+            try:
+                wait = WebDriverWait(driver, 9)
+                wait.until(EC.presence_of_element_located((By.CLASS_NAME, 'details-info')))
+
+            except TimeoutException:
+                print "Loading took too much time!"
+            sleep(1)
+            driver.close()
+
+        except Exception, e:
+            print "Something not right, Error: ", e
+            driver.close()
 
 
 def data_on():
@@ -129,46 +151,58 @@ def turn_off_data():
             if check_internet():
                 print "Internet is working. Turning OFF Mobile Data, please wait.."
                 data_off()
-                sleep(2)
                 print "Lets check if Mobile Data successfully turned OFF!, pinging Google..."
 
-        except check_internet() == True:
-            print "Internet still working, lets try again!"
+        except:
+            print "Something went wrong, trying again.."
             continue
-        else:
-            print "Mobile Data is turned OFF!\n"
-            break
+        finally:
+            if check_internet():
+                print "Internet still working, lets try again!"
+                return True
+            else:
+                print "Mobile Data turned OFF!\n"
+                break
 
 
 def turn_on_data():
     while True:
         try:
-            print "Now Turning Mobile Data ON, please wait.."
+            if not check_internet():
+                print "Now Turning Mobile Data ON, please wait.."
 
-            data_on()
+                data_on()
 
-            sleep(8)
+                sleep(8)
 
-            print "Checking connectivity, pinging google.."
+                print "Checking connectivity, pinging google.."
 
-        except not check_internet():
+        except:
             print "Internet not working, lets try again!"
             continue
+
+        if not check_internet():
+            print "Internet not working, lets try again!"
+            return True
         else:
-            print "Internet connection established!"
+            print "Connection established!"
             break
 
 
 def get_ip():
     i = 5
-    while i:
-        try:
-            my_ip = requests.get('http://ip.42.pl/raw').text
-            return my_ip
-        except:
-            print "Unable to get IP, trying again.."
-            i -= 1
-            pass
+    while not check_internet():
+        print "Waiting for Mobile Data!"
+        sleep(0.5)
+    else:
+        while i:
+            try:
+                my_ip = requests.get('http://ip.42.pl/raw').text
+                return my_ip + "\n"
+            except Exception, e:
+                print "Unable to get IP, trying again.. Error: ", e
+                i -= 1
+                pass
 
 
 print "Welcome to Hax 4Fun clicker!\n==========================================="
@@ -176,9 +210,11 @@ print "\nPlease make sure that your Phone is connected and USB Debugging and USB
 
 
 first_url = str(raw_input("Enter your first 4Fun url: "))
+
 second_url = str(raw_input("Enter second 4Fun url: "))
 
 my_4fun1 = HitFun(url=first_url)
+
 my_4fun2 = HitFun(url=second_url)
 
 while True:
@@ -211,15 +247,21 @@ def select_browser():
         print "You selected Chrome browser!\n"
     return browser_name
 
+
 browser_to_use = select_browser()
 
 hit_counter = 1
 hits_done = 0
 
+
 while n_hits:
+    t1 = time.time()
     print "Checking Internet connection, pinging Google!"
 
-    turn_off_data()
+    if check_internet():
+        turn_off_data()
+    else:
+        print "Mobile Data already OFF"
 
     turn_on_data()
 
@@ -244,7 +286,13 @@ while n_hits:
     hits_done += 1
     print "Hit was successful\n"
     print "Total Successful hits done: %d" % hits_done
-    print "==== ==== ==== ==== ==== ==== ==== ==== ==== ==== ==== ===="
-
+    
     n_hits -= 1
     hit_counter += 1
+    
+    t2 = time.time()
+    print "\nThis Hit took: " + str(t2 - t1) + "seconds\n"
+    print "==== ==== ==== ==== ==== ==== ==== ==== ==== ==== ==== ===="
+
+    
+    
