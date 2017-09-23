@@ -3,7 +3,7 @@ A Python program to get hits.
 
 -----Installation-----
 
-1. Install latest firefox geckodriver from https://github.com/mozilla/geckodriver/releases 
+1. Install latest firefox geckodriver (NO NEED NOW, PATH ADDED IN THE SCRIPT)
 
 2. Dependencies:
 - Selenium 
@@ -17,8 +17,7 @@ A Python program to get hits.
 4. Set PATH
 (Click on Start and Type Environment, Edit system PATH)
 Add the following to your system environment path:
-"C:\Python27\selenium\geckodriver\"
-"C:\Python27\"
-"C:\Python27\Lib\site-packages\"
-"C:\Python27\Scripts\"
+"C:\Python27\";
+"C:\Python27\Lib\site-packages\";
+"C:\Python27\Scripts\";
 
