@@ -8,6 +8,7 @@ from time import sleep
 import socket
 import requests
 from random import randint
+import time
 
 
 class HitFun:
@@ -63,12 +64,12 @@ class HitFun:
                 print "Loading took too much time!"
             sleep(1)
 
-            driver.close()
+            driver.quit()
 
         except Exception, e:
             print "Something is not right! Error: ", e
             print "Closing the instance of browser!"
-            driver.close()
+            driver.quit()
 
     def c_profile(self):
 
@@ -93,14 +94,15 @@ class HitFun:
 
             try:
                 wait = WebDriverWait(driver, 14)
-                wait.until(EC.presence_of_element_located((By.CLASS_NAME, 'installLink')))
+                wait.until(EC.presence_of_element_located((By.LINK_TEXT, 'INSTALL')))
 
             except TimeoutException:
                 print "Loading took too much time!"
 
             install = driver.find_element_by_class_name("installLink")
 
-            install.click()
+            driver.execute_script("arguments[0].click();", install)
+
             try:
                 wait = WebDriverWait(driver, 9)
                 wait.until(EC.presence_of_element_located((By.CLASS_NAME, 'details-info')))
@@ -108,11 +110,11 @@ class HitFun:
             except TimeoutException:
                 print "Loading took too much time!"
             sleep(1)
-            driver.close()
+            driver.quit()
 
         except Exception, e:
             print "Something not right, Error: ", e
-            driver.close()
+            driver.quit()
 
 
 def data_on():
@@ -204,18 +206,32 @@ def get_ip():
                 i -= 1
                 pass
 
-
 print "Welcome to Hax 4Fun clicker!\n==========================================="
 print "\nPlease make sure that your Phone is connected and USB Debugging and USB Tethering is enabled."
-
 
 first_url = str(raw_input("Enter your first 4Fun url: "))
 
 second_url = str(raw_input("Enter second 4Fun url: "))
 
-my_4fun1 = HitFun(url=first_url)
+my_urls = {
+        1: first_url,
+        2: second_url
+    }
 
-my_4fun2 = HitFun(url=second_url)
+
+def add_wait():
+    random_seconds = randint(2, 25)
+    return random_seconds
+
+
+def random_urls():
+    ran_num = randint(1, len(my_urls))
+    return my_urls.get(ran_num)
+
+# Not needed anymore since I added random url support
+#my_4fun1 = HitFun(url=first_url)
+
+#my_4fun2 = HitFun(url=second_url)
 
 while True:
     try:
@@ -255,7 +271,13 @@ hits_done = 0
 
 
 while n_hits:
+
     t1 = time.time()
+
+    current_url = random_urls()
+
+    my_4fun = HitFun(url=current_url)
+
     print "Checking Internet connection, pinging Google!"
 
     if check_internet():
@@ -268,31 +290,28 @@ while n_hits:
     print "Your IP Address is: ", get_ip()
 
     if browser_to_use == 1:
-        if hit_counter % 2 == 0:
-            print "Everything is OK, opening Link 2"
-            my_4fun1.open_firefox()
-        else:
-            print "Everything is OK, opening Link 1"
-            my_4fun2.open_firefox()
+        print "Everything is OK, opening random url"
+        my_4fun.open_firefox()
 
     else:
-        if hit_counter % 2 == 0:
-            print "Everything is OK, opening Link 2"
-            my_4fun1.open_chrome()
-        else:
-            print "Everything is OK, opening Link 1"
-            my_4fun2.open_chrome()
+        print "Everything is OK, opening random url"
+        my_4fun.open_chrome()
 
     hits_done += 1
     print "Hit was successful\n"
     print "Total Successful hits done: %d" % hits_done
-    
+
     n_hits -= 1
     hit_counter += 1
-    
+
     t2 = time.time()
+
     print "\nThis Hit took: " + str(t2 - t1) + "seconds\n"
+
     print "==== ==== ==== ==== ==== ==== ==== ==== ==== ==== ==== ===="
 
-    
-    
+    waiting = add_wait()
+
+    print "Adding a random wait of: %s seconds!" % str(waiting)
+
+    sleep(waiting)
