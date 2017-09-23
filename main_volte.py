@@ -1,3 +1,12 @@
+__author__ = "Shantam Mathuria (Hax0)"
+__copyright__ = "Open source"
+__credits__ = ["Shantam Mathuria", "Ujjaval"]
+__license__ = "GPL"
+__version__ = "2.0"
+__maintainer__ = "Shantam Mathuria"
+__email__ = "shantam.m22@gmail.com"
+__status__ = "Production"
+
 from selenium import webdriver
 from os import system
 from selenium.webdriver.common.by import By
