@@ -108,6 +108,7 @@ class HitFun:
     def open_chrome(self):
 
         driver = webdriver.Chrome(executable_path='chromedriver/chromedriver.exe', chrome_options=self.c_profile())
+        driver.set_window_size(720, 1280)
 
         try:
 
