@@ -12,7 +12,7 @@ import time
 
 __author__ = "Shantam Mathuria (Hax0)"
 __copyright__ = "Open source"
-__credits__ = ["Shantam Mathuria", "Ujjaval"]
+__credits__ = ["Shantam Mathuria"]
 __license__ = "GPL"
 __version__ = "2.0"
 __maintainer__ = "Shantam Mathuria"
