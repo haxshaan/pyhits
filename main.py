@@ -118,12 +118,13 @@ class HitFun:
                 wait = WebDriverWait(driver, 15)
                 wait.until(EC.presence_of_element_located((By.LINK_TEXT, 'INSTALL')))
 
+                install = driver.find_element_by_class_name("installLink")
+
+                driver.execute_script("arguments[0].click();", install)
+
             except TimeoutException:
                 print "Loading took too much time!"
-
-            install = driver.find_element_by_class_name("installLink")
-
-            driver.execute_script("arguments[0].click();", install)
+                driver.quit()
 
             try:
                 wait = WebDriverWait(driver, 14)
@@ -131,13 +132,14 @@ class HitFun:
 
             except TimeoutException:
                 print "Loading took too much time!"
-            sleep(1)
-            driver.quit()
+                driver.quit()
 
         except Exception, e:
             print "Something not right, Error: ", e
             driver.quit()
 
+        finally:
+            driver.quit()
 
 def data_on():
     system("adb shell svc data enable")
@@ -309,7 +311,7 @@ while n_hits:
     if hits_done:
 
         while True:
-            print "\nCHECKING YOUR IP NOW!!\n"
+            print "\n____CHECKING YOUR IP NOW____\n"
             new_ip = get_ip()
 
             if new_ip == last_ip[-1]:
@@ -324,7 +326,9 @@ while n_hits:
 
     last_ip.append(get_ip())
 
-    print "Your IP Address is: ", last_ip[-1]
+    if hits_done > 2:
+        print "Last IP Address: ", last_ip[-2]
+    print "New IP Address: ", last_ip[-1]
 
     if browser_to_use == 1:
         print "Everything is OK, opening random url"
