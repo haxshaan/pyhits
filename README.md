@@ -21,3 +21,8 @@ Add the following to your system environment path:
 "C:\Python27\Lib\site-packages\";
 "C:\Python27\Scripts\";
 
+
+------NOTE-----
+- Make sure your Phone is connected
+- USB Debugging is enabled in Developers Option.
+- USB Tethering is enabled (Will be automated in future builds).
