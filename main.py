@@ -326,7 +326,7 @@ while n_hits:
 
     last_ip.append(get_ip())
 
-    if hits_done > 2:
+    if hits_done > 1:
         print "Last IP Address: ", last_ip[-2]
     print "New IP Address: ", last_ip[-1]
 
