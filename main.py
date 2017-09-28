@@ -62,6 +62,7 @@ class HitFun:
     def open_firefox(self):
 
         driver = webdriver.Firefox(executable_path=r'firefox_driver\geckodriver.exe', firefox_profile=self.f_profile())
+        driver.set_window_size(720, 1280)
 
         try:
 
@@ -69,27 +70,29 @@ class HitFun:
 
             try:
                 wait = WebDriverWait(driver, 15)
-                wait.until(EC.presence_of_element_located((By.CLASS_NAME, 'installLink')))
+                wait.until(EC.presence_of_element_located((By.LINK_TEXT, 'INSTALL')))
+
+                install = driver.find_element_by_class_name("installLink")
+
+                driver.execute_script("arguments[0].click();", install)
 
             except TimeoutException:
                 print "Loading took too much time!"
+                driver.quit()
 
-            install = driver.find_element_by_class_name("installLink")
-
-            install.click()
             try:
                 wait = WebDriverWait(driver, 14)
                 wait.until(EC.presence_of_element_located((By.CLASS_NAME, 'details-info')))
 
             except TimeoutException:
                 print "Loading took too much time!"
-            sleep(1)
-
-            driver.quit()
+                driver.quit()
 
         except Exception, e:
-            print "Something is not right! Error: ", e
-            print "Closing the instance of browser!"
+            print "Something not right, Error: ", e
+            driver.quit()
+
+        finally:
             driver.quit()
 
     def c_profile(self):
@@ -326,7 +329,7 @@ while n_hits:
 
     last_ip.append(get_ip())
 
-    if hits_done:
+    if hits_done > 1:
         print "Last IP Address: ", last_ip[-2]
     print "New IP Address: ", last_ip[-1]
 
