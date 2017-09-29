@@ -207,7 +207,7 @@ def turn_on_data():
 
 def get_ip():
     i = 5
-    j = 20
+    j = 10
     while j and not check_internet():
         print "Waiting for Mobile Data!"
         sleep(1)
