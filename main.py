@@ -215,8 +215,9 @@ def get_ip():
     else:
         while i:
             try:
-                my_ip = requests.get('http://ip.42.pl/raw').text
+                my_ip = requests.get('https://api.ipify.org/?format=json').json()['ip']
                 return my_ip + "\n"
+            
             except Exception, e:
                 print "Unable to get IP, trying again.. Error: ", e
                 i -= 1
